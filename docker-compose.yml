@@ -1,0 +1,10 @@
+version: "3.8"
+
+services:
+  nuitka-linux-exe:
+    build: .
+    container_name: nuitka-linux-exe
+    volumes:
+      - ./output:/output # Mount local output directory to container
+    working_dir: /app # Set the working directory inside the container
+    command: ./linuxpackager # Run the generated Linux binary
