@@ -11,6 +11,7 @@ import pyautogui
 import cv2
 import numpy as np
 from classes.image_to_search import ImageToSearch
+from constants.constants import POTION_USE_COUNT_AFTER_REVIVED
 from graceful_shutdown.graceful_shutdown_cleaners import cleanup, signal_handler
 from helpers.helpers import save_screenshot_to_local
 
@@ -139,30 +140,13 @@ class Application:
             # keyboard.release('space')
             
             if searched_image_index == 0: # If character is dead
-                pyautogui.moveTo(self.click_shortest_to_center_coord[0], self.click_shortest_to_center_coord[1])
-                
-                time.sleep(0.1)
-                pyautogui.moveRel(20, 0, duration=0.1)
-                
-                time.sleep(0.1)
-                pyautogui.click() # Clicking to revive
-                
-                for _ in range(1): # Use potions
-                    time.sleep(0.1)
-                    keyboard.press_and_release('1')
-                
-                time.sleep(2) #Rest some to heal up
+                self.bot_action_when_character_is_dead()
                 
             elif searched_image_index == 1: # If character is alive and focused on target
-                for _ in range(1):
-                    time.sleep(0.1)
-                    keyboard.press_and_release('space')
+                self.bot_action_when_character_is_alive_and_focused()
                     
             else: # If character is alive and but not focused
-                pyautogui.moveTo(self.click_shortest_to_center_coord[0], self.click_shortest_to_center_coord[1])
-                
-                time.sleep(0.1)
-                pyautogui.click()
+                self.bot_action_when_character_is_alive_and_not_focused()
                 
             time.sleep(0.1)
             keyboard.press_and_release('2') # Use poison skill
@@ -173,6 +157,32 @@ class Application:
             print(f"Cursor moved to the center of the matched image at {self.click_shortest_to_center_coord}.")
         else:
             print(f"No window found for PID: {self.process_id}.")
+    
+    def bot_action_when_character_is_dead(self):
+        pyautogui.moveTo(self.click_shortest_to_center_coord[0], self.click_shortest_to_center_coord[1])
+                
+        time.sleep(0.1)
+        pyautogui.moveRel(20, 0, duration=0.1)
+        
+        time.sleep(0.1)
+        pyautogui.click() # Clicking to revive
+        
+        for _ in range(POTION_USE_COUNT_AFTER_REVIVED): # Use potions
+            time.sleep(0.1)
+            keyboard.press_and_release('1')
+        
+        time.sleep(2) #Rest some to heal up
+    
+    def bot_action_when_character_is_alive_and_focused(self):
+        for _ in range(1):
+            time.sleep(0.1)
+            keyboard.press_and_release('space')
+    
+    def bot_action_when_character_is_alive_and_not_focused(self):
+        pyautogui.moveTo(self.click_shortest_to_center_coord[0], self.click_shortest_to_center_coord[1])
+                
+        time.sleep(0.1)
+        pyautogui.click()
     
     def get_closest_coordinate_to_center(self, *locations, searched_image_height: int, searched_image_width: int):
         target_x_coord: int = 960
